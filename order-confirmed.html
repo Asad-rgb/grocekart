@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zepto Clone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: white;
+      width: 100%;
+    }
+    
+    .order-card {
+      width: 4000000px;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      color: white;
+      background: linear-gradient(to bottom right, #3b0366, #730a6b);
+      padding: 24px;
+    }
+    
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 20px;
+    }
+    
+    .cancel-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    
+    .timer-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      margin-bottom: 24px;
+    }
+    
+    .timer-circle {
+      width: 128px;
+      height: 128px;
+      border: 8px solid #ec4899;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .spinner {
+      position: absolute;
+      width: 144px;
+      height: 144px;
+      border-top: 8px solid #ec4899;
+      border-left: 8px solid #ec4899;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .progress-steps {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-align: center;
+      font-size: 12px;
+    }
+    
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+    
+    .step-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-bottom: -4px;
+    }
+    
+    .step-dot.active {
+      background-color: #ec4899;
+    }
+    
+    .step-dot.inactive {
+      background-color: #9ca3af;
+    }
+    
+    .step-line {
+      flex-grow: 1;
+      border-top: 2px dashed #9ca3af;
+      margin-top: 8px;
+    }
+    
+    .card-body {
+      padding: 16px;
+    }
+    
+    .savings-banner {
+      width: 100%;
+      background: #ffde2f;
+      color: #374151;
+      font-weight: 700;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 16px;
+    }
+    
+    .info-card {
+      background-color: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 16px;
+    }
+    
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .icon-pink {
+      color: #ec4899;
+    }
+    
+    .icon-purple {
+      color: #8b5cf6;
+    }
+    
+    .content-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    .content-subtitle {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .view-details {
+      color: #ffffff;
+      font-weight: 600;
+      background: none;
+      border: none;
+      cursor: pointer;
+      background-color: #ef405b;
+      padding: 10px;
+      border-radius: 80px;
+    }
+    
+    .promo-card {
+      background-color: #ffde2f;
+      padding: 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    
+    .promo-percent {
+      color: #ec4899;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .promo-text {
+      color: #374151;
+      font-weight: 600;
+    }
+    
+    .promo-subtext {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    
+    .referral-code {
+      background-color: #f3f4f6;
+      padding: 8px 16px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .code-text {
+      font-family: monospace;
+      color: #374151;
+    }
+    
+    .share-btn {
+      color: #10b981;
+      font-weight: 700;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .card-header img {
+      height:30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="order-card">
+    <div class="card-header">
+      <div class="header-top">
+        <div class="brand">
+          <span class="material-icons">arrow_back</span>
+          <img src="zepto-seeklogo.svg" alt="Zepto Logo">
+        </div>
+        <button class="cancel-btn">Cancel</button>
+      </div>
+      
+      <div class="timer-container">
+        <div class="timer-circle">10:52</div>
+        <div class="spinner"></div>
+      </div>
+      
+      <div class="progress-steps">
+        <div class="step">
+          <div class="step-dot active"></div>
+          <p>Confirmed</p>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-dot inactive"></div>
+          <p>Packed</p>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-dot inactive"></div>
+          <p>On the way</p>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-dot inactive"></div>
+          <p>Delivered</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-body">
+      <button class="savings-banner">You have a saving of ₹15</button>
+      
+      <div class="info-card">
+        <div class="card-row">
+          <div class="card-content">
+            <span class="material-icons icon-pink">receipt_long</span>
+            <div>
+              <p class="content-title">Order detail</p>
+              <p class="content-subtitle">2 items from Gokul Stores</p>
+            </div>
+          </div>
+          <button class="view-details">VIEW DETAILS</button>
+        </div>
+      </div>
+      
+      <div class="info-card">
+        <div class="card-content">
+          <span class="material-icons icon-purple">location_on</span>
+          <div>
+            <p class="content-title">Delivering to</p>
+            <p class="content-subtitle">Home, Hsr Layout, Bangalore</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="promo-card">
+        <div class="promo-percent">15% OFF</div>
+        <div>
+          <p class="promo-text">Refer your friends & use your referral code to unlock an extra 15%</p>
+          <p class="promo-subtext">Min. order value ₹299. Max. discount ₹50</p>
+        </div>
+      </div>
+      
+      <div class="referral-code">
+        <span class="code-text">VY9G27</span>
+        <button class="share-btn">
+          <span class="material-icons">whatsapp</span>
+          SHARE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Back button functionality
+      document.querySelector('.brand').addEventListener('click', function() {
+        window.history.back();
+      });
+      
+      // Cancel button functionality
+      document.querySelector('.cancel-btn').addEventListener('click', function() {
+        if(confirm('Are you sure you want to cancel this order?')) {
+          alert('Order cancelled');
+          // In a real app, you would cancel the order here
+        }
+      });
+      
+      // View details button functionality
+      document.querySelector('.view-details').addEventListener('click', function() {
+        alert('Showing order details...');
+      });
+      
+      // Share button functionality
+      document.querySelector('.share-btn').addEventListener('click', function() {
+        const code = document.querySelector('.code-text').textContent;
+        alert(`Sharing referral code: ${code}`);
+        // In a real app, this would open WhatsApp with the referral message
+      });
+      
+      // Timer animation (just for show - not a real countdown)
+      let seconds = 52;
+      const timerElement = document.querySelector('.timer-circle');
+      
+      setInterval(() => {
+        seconds = seconds > 0 ? seconds - 1 : 59;
+        const minutes = Math.floor(seconds / 60);
+        timerElement.textContent = `10:${seconds.toString().padStart(2, '0')}`;
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

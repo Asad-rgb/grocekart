@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zepto Clone - OTP Verification</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      background: linear-gradient(to bottom right, #3b0366, #730a6b);
+    }
+    
+    .otp-card {
+      width: 100%;
+      max-width: 400px;
+      color: white;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+    
+    .card-content {
+      padding: 32px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .back-button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      margin-left: -8px;
+      align-items: center;
+      font-size: 24px; /* Larger size for the arrow */
+    }
+    
+    .long-tail-arrow {
+      font-size: 28px;
+      transform: rotate(180deg); /* Flips the arrow to point left */
+      display: inline-block;
+    }
+
+    .card-title {
+      font-size: 27px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    
+    .card-subtitle {
+      font-size: 14px;
+      color:white;
+      margin-bottom: 32px;
+    }
+    
+    .otp-container {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    
+    .otp-digit {
+      width: 40px;
+      height: 40px;
+      background-color:white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #000;
+    }
+    
+    .otp-input {
+      position: absolute;
+      opacity: 0;
+      height: 0;
+      width: 0;
+    }
+    
+    .otp-timer {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .timer {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    
+    .resend-btn {
+      color: #ec4899;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    
+    .hidden-input {
+      position: absolute;
+      left: -9999px;
+    }
+  </style>
+</head>
+<body>
+  <div class="otp-card">
+    <div class="card-content">
+      <button class="back-button" id="back-button">
+          <span class="long-tail-arrow">&#10141;</span>
+    </button>
+      <h2 class="card-title">OTP <br>Verification</h2>
+      <p class="card-subtitle">OTP has been sent to +91 8986542444</p>
+      
+      <div class="otp-container" id="otp-container">
+        <div class="otp-digit" id="digit1"></div>
+        <div class="otp-digit" id="digit2"></div>
+        <div class="otp-digit" id="digit3"></div>
+        <div class="otp-digit" id="digit4"></div>
+        <div class="otp-digit" id="digit5"></div>
+        <div class="otp-digit" id="digit6"></div>
+      </div>
+      
+      <!-- Hidden input that will receive focus and show native keyboard -->
+      <input type="tel" class="otp-input" id="otp-input" maxlength="6" inputmode="numeric" pattern="[0-9]*">
+      
+      <div class="otp-timer">
+        <p class="timer" id="timer">00:29</p>
+        <button class="resend-btn" id="resend-btn">Didn't get it?</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const otpDigits = [
+        document.getElementById('digit1'),
+        document.getElementById('digit2'),
+        document.getElementById('digit3'),
+        document.getElementById('digit4'),
+        document.getElementById('digit5'),
+        document.getElementById('digit6')
+      ];
+      
+      const otpInput = document.getElementById('otp-input');
+      const timerElement = document.getElementById('timer');
+      const resendBtn = document.getElementById('resend-btn');
+      const otpContainer = document.getElementById('otp-container');
+      
+      let timeLeft = 29;
+      
+      // Focus the hidden input when clicking on OTP container
+      otpContainer.addEventListener('click', () => {
+        otpInput.focus();
+      });
+      
+      // Timer functionality
+      const timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          resendBtn.style.color = '#ec4899';
+          resendBtn.disabled = false;
+        }
+      }, 1000);
+      
+      // Handle OTP input
+      otpInput.addEventListener('input', (e) => {
+        const value = e.target.value;
+        
+        // Update each digit display
+        for (let i = 0; i < 6; i++) {
+          otpDigits[i].textContent = value[i] || '';
+        }
+        
+        // If OTP is complete
+        if (value.length === 6) {
+          setTimeout(() => {
+            alert(`OTP entered: ${value}`);
+          }, 100);
+        }
+      });
+      
+      // Handle backspace key
+      otpInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && otpInput.value.length === 0) {
+          // Prevent default to avoid moving focus away
+          e.preventDefault();
+        }
+      });
+      
+      // Resend OTP functionality
+      resendBtn.addEventListener('click', () => {
+        if (timeLeft <= 0) {
+          alert('New OTP has been sent!');
+          timeLeft = 29;
+          clearInterval(timerInterval);
+          startTimer();
+          otpInput.value = '';
+          updateOtpDisplay('');
+        }
+      });
+      
+      function startTimer() {
+        const timerInterval = setInterval(() => {
+          timeLeft--;
+          const minutes = Math.floor(timeLeft / 60);
+          const seconds = timeLeft % 60;
+          timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            resendBtn.style.color = '#ec4899';
+            resendBtn.disabled = false;
+          }
+        }, 1000);
+      }
+      
+      function updateOtpDisplay(value) {
+        for (let i = 0; i < 6; i++) {
+          otpDigits[i].textContent = value[i] || '';
+        }
+      }
+    });
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+  const otpDigits = [
+    document.getElementById('digit1'),
+    document.getElementById('digit2'),
+    document.getElementById('digit3'),
+    document.getElementById('digit4'),
+    document.getElementById('digit5'),
+    document.getElementById('digit6')
+  ];
+  
+  const otpInput = document.getElementById('otp-input');
+  const timerElement = document.getElementById('timer');
+  const resendBtn = document.getElementById('resend-btn');
+  const otpContainer = document.getElementById('otp-container');
+  const backButton = document.getElementById('back-button');
+  const cardContent = document.querySelector('.card-content');
+  
+  let timeLeft = 29;
+  let redirectTimer;
+  
+  // Create circular loader element
+  const loader = document.createElement('div');
+  loader.className = 'circular-loader';
+  loader.innerHTML = `
+    <svg class="circular-loader-svg" viewBox="25 25 50 50">
+      <circle class="loader-path" cx="50" cy="50" r="20" fill="none" stroke="#10B981" stroke-width="4"/>
+    </svg>
+  `;
+  loader.style.display = 'none';
+  loader.style.position = 'absolute';
+  loader.style.top = '50%';
+  loader.style.left = '50%';
+  loader.style.transform = 'translate(-50%, -50%)';
+  loader.style.width = '60px';
+  loader.style.height = '60px';
+  loader.style.zIndex = '10';
+  document.querySelector('.otp-card').appendChild(loader);
+
+  // Add CSS for loader animation
+  const style = document.createElement('style');
+  style.textContent = `
+    .circular-loader-svg {
+      animation: rotate 2s linear infinite;
+    }
+    .loader-path {
+      stroke-dasharray: 150, 200;
+      stroke-dashoffset: 0;
+      animation: dash 1.5s ease-in-out infinite;
+      stroke-linecap: round;
+    }
+    @keyframes rotate {
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes dash {
+      0% {
+        stroke-dasharray: 1, 200;
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -35;
+      }
+      100% {
+        stroke-dasharray: 89, 200;
+        stroke-dashoffset: -124;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Focus the hidden input when clicking on OTP container
+  otpContainer.addEventListener('click', () => {
+    otpInput.focus();
+  });
+  
+  // Back button functionality
+  backButton.addEventListener('click', () => {
+    window.history.back();
+  });
+  
+  // Timer functionality
+  const timerInterval = setInterval(() => {
+    timeLeft--;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      resendBtn.style.color = '#ec4899';
+      resendBtn.disabled = false;
+    }
+  }, 1000);
+  
+  // Handle OTP input
+  otpInput.addEventListener('input', (e) => {
+    const value = e.target.value;
+    
+    // Update each digit display
+    for (let i = 0; i < 6; i++) {
+      otpDigits[i].textContent = value[i] || '';
+    }
+    
+    // If OTP is complete
+    if (value.length === 6) {
+      // Change all cells to green
+      otpDigits.forEach(digit => {
+        digit.classList.add('filled');
+      });
+      
+      // Show circular loader
+      loader.style.display = 'block';
+      cardContent.style.opacity = '0.5';
+      
+      // After 2 seconds, redirect
+      redirectTimer = setTimeout(() => {
+        window.location.href = 'https://example.com/success'; // Change to your custom link
+      }, 2000);
+    } else {
+      // If user deletes a digit, reset everything
+      clearTimeout(redirectTimer);
+      loader.style.display = 'none';
+      cardContent.style.opacity = '1';
+      otpDigits.forEach(digit => {
+        digit.classList.remove('filled');
+      });
+    }
+  });
+  
+  // Handle backspace key
+  otpInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && otpInput.value.length === 0) {
+      e.preventDefault();
+    }
+  });
+  
+  // Resend OTP functionality
+  resendBtn.addEventListener('click', () => {
+    if (timeLeft <= 0) {
+      alert('New OTP has been sent!');
+      timeLeft = 29;
+      clearInterval(timerInterval);
+      startTimer();
+      otpInput.value = '';
+      updateOtpDisplay('');
+    }
+  });
+  
+  function startTimer() {
+    const timerInterval = setInterval(() => {
+      timeLeft--;
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        resendBtn.style.color = '#ec4899';
+        resendBtn.disabled = false;
+      }
+    }, 1000);
+  }
+  
+  function updateOtpDisplay(value) {
+    for (let i = 0; i < 6; i++) {
+      otpDigits[i].textContent = value[i] || '';
+    }
+  }
+});
+  </script>
+</body>
+</html>
